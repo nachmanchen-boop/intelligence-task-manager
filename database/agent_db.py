@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 from db_connection import Connection
 connection  = Connection()
+
 #Connection.get_connection()
 class Agent:
     def create_agent(self,data:dict):
@@ -8,12 +9,14 @@ class Agent:
             with conn.cursor() as cursor :
                 parts = []
                 val = []
+                print("ddd")
                 for key,value in data.items() :
                     parts.append(f"{key} = %s")
                     val.append(value)
+                d = {f", ".join(parts)}
                 val.append(id)
                 query = f"""INSERT INTO agents
-                VALUES({f", ".join(parts)}) """
+                VALUES(d) """
                 cursor.execute(query,val)
                 conn.commit()
 
@@ -72,9 +75,3 @@ class Agent:
                 count = cursor.fetchone()
         return count
 
-
-s = Agent()
-a = {
-    'name':"david"
-}
-s.create_agent(a)
