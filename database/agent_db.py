@@ -1,4 +1,4 @@
-from fastapi import HTTPException
+from fastapi import HTTPxception
 from db_connection import Connection
 connection  = Connection()
 
@@ -37,8 +37,20 @@ class Agent:
                 data = cursor.fetchone()
         return data
                 
-    def update_agent(id):
-        pass
+    def update_agent(id,data):
+        with connection.get_connection() as conn:
+            with conn.cursor(dictionary=True) as cursor:
+                parts = []
+                values = []
+                for key,value in data.items() :
+                    parts.append(f"{key} = %s")
+                    values.append(value)
+                values.append(id)
+                query = f"UPDATE agents SET {", ".join(parts)} WHERE id = %s"
+                cursor.execute(query,values)
+                conn.commit()
+                is_change = cursor.rowcount > 0 
+            return is_change
     def deactivate_agent(id):
          with connection.get_connection() as conn:
             with conn.cursor() as cursor :
@@ -51,9 +63,32 @@ class Agent:
                 conn.commit()
 
     def increment_completed(id):
-        pass
+        with connection.get_connection() as conn:
+            with conn.cursor() as cursor :
+                query_completed = "SELECT completed_missions FROM agents WHERE id  = %s"
+                cursor.execute(query_completed(id,))
+                completed = cursor.fetchone()
+                completed +=1 
+                query = "UPDATE agents SET completed_missions = {completed}  WHERE id = %s "
+                cursor.execute(query(id,))
+                conn.commit()
+
+
+
+
+
+                
     def increment_failde(id):
-        pass
+        with connection.get_connection() as conn:
+            with conn.cursor() as cursor :
+                query_completed = "SELECT failed_missions FROM agents WHERE id  = %s"
+                cursor.execute(query_completed(id,))
+                completed = cursor.fetchone()
+                completed +=1 
+                query = "UPDATE agents SET failed_missions = {completed}  WHERE id = %s "
+                cursor.execute(query(id,))
+                conn.commit()
+
     def get_agent_performance(id):
         with connection.get_connection() as conn:
             with conn.cursor() as cursor :
