@@ -9,7 +9,7 @@ class Agent:
                 count = ", ".join(['%s'] * len(data))
                 names = ", ".join(data.keys())
                 val = tuple(data.values())
-                query = f"INSERT INTO missions({names})  VALUES({count})"
+                query = f"INSERT INTO agents({names})  VALUES({count})"
                 print(query)
                 print(val)
                 cursor.execute(query,val)
@@ -30,12 +30,12 @@ class Agent:
     def get_agent_by_id(self,id):
         with connection.get_connection() as conn:
             with conn.cursor(dictionary=True) as cursor :
-                query = ("SELECT * FROM agents WHERE id = %s")
+                query = "SELECT * FROM agents WHERE id = %s"
                 cursor.execute(query,(id,))
                 data = cursor.fetchone()
         return data
                 
-    def update_agent(id,data):
+    def update_agent(self,id,data):
         with connection.get_connection() as conn:
             with conn.cursor(dictionary=True) as cursor:
                 parts = []
@@ -44,7 +44,8 @@ class Agent:
                     parts.append(f"{key} = %s")
                     values.append(value)
                 values.append(id)
-                query = f"UPDATE agents SET {", ".join(parts)} WHERE id = %s"
+                conect_parts =", ".join(parts)
+                query = f"UPDATE agents SET {conect_parts} WHERE id = %s"
                 cursor.execute(query,values)
                 conn.commit()
                 is_change = cursor.rowcount > 0 
@@ -62,7 +63,7 @@ class Agent:
     def increment_completed(self,id:int):
         with connection.get_connection() as conn:
             with conn.cursor() as cursor :
-                query_completed = "UPDATE completed_missions = completed_missions + 1 WHERE id  = %s"
+                query_completed = "UPDATE agents SET completed_missions = completed_missions + 1 WHERE id  = %s"
                 cursor.execute(query_completed,(id,))
 
                 conn.commit()
@@ -74,22 +75,24 @@ class Agent:
 
 
                 
-    def increment_failde(id):
+    def increment_failde(self,id):
         with connection.get_connection() as conn:
             with conn.cursor() as cursor :
-                query_failed = "UPDATE failed_missions = failed_missions + 1 WHERE id  = %s"
+                query_failed = "UPDATE agents SET failed_missions = failed_missions + 1 WHERE id  = %s"
 
                 cursor.execute(query_failed,(id,))
                 conn.commit()
                 failed = cursor.fetchone()
         return failed
 
-    def get_agent_performance(id):
+    def get_agent_performance(self,id):
         with connection.get_connection() as conn:
-            with conn.cursor() as cursor :
-                query_completed = "SELECT completed_missions,failed_missions AS missens FROM agents WHERE id  = %s"
+            with conn.cursor(dictionary=True) as cursor :
+                query_completed = "SELECT completed_missions,failed_missions  FROM agents WHERE id  = %s"
                 cursor.execute(query_completed,(id,))
                 all =  cursor.fetchone()
+                if not all :
+                    return None
                 completed =all['completed_missions']
                 failed = all['failed_missions']
                 total = completed + failed
@@ -113,11 +116,13 @@ class Agent:
 
 
                 
-    def agents_active_count():
+    def count_active_agents(self):
         with connection.get_connection() as conn:
             with conn.cursor() as cursor :
                 query = "SELECT COUNT(*) AS active FROM agents WHERE is_active = True"
                 cursor.execute(query)
                 count = cursor.fetchone()
-        return count
+                if not count:
+                    return 0
+        return count['active']
 

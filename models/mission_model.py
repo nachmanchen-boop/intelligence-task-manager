@@ -15,17 +15,15 @@ class Create_mission(BaseModel):
     title :Optional[str] = None
     description :Optional[str] =None
     location :Optional[str] = None
-    difficulty :Optional[int] = Field(default=None,ge=0,le=10)
-    importance :Optional[int] = Field(default=None,ge=0,le=10)
-    status : Optional[Status_enam] = Field(default="NEW")
+    difficulty :Optional[int] = Field(default=None,ge=1,le=10)
+    importance :Optional[int] = Field(default=None,ge=1,le=10)
 
 
 class Update_mission(BaseModel):
     title :Optional[str] = None
     description :Optional[str] =None
     location :Optional[str] = None
-    difficulty :Optional[int] = Field(default=None,ge=0,le=10)
-    importance :Optional[int] = Field(default=None,ge=0,le=10)
+    difficulty :Optional[int] = Field(default=None,ge=1,le=10)
+    importance :Optional[int] = Field(default=None,ge=1,le=10)
     status : Optional[Status_enam] = None
-    assigned_agent_id : Optional[int] = None
 

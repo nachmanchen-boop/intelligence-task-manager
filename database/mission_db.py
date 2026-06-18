@@ -7,13 +7,10 @@ class Mission:
     def create_mission(self,data:dict):
          with connection.get_connection() as conn:
             with conn.cursor() as cursor :
-                print("ddd")
                 count = ", ".join(['%s'] * len(data))
                 names = ", ".join(data.keys())
                 
                 val = list(data.values())
-
-
 
                 query = f"INSERT INTO missions({names})  VALUES({count})"
                 cursor.execute(query,val)
@@ -29,12 +26,12 @@ class Mission:
 
     def get_mission_by_id(self,id):
         with connection.get_connection() as conn:
-            with conn.cursor() as cursor :
+            with conn.cursor(dictionary=True) as cursor :
                 query = ("SELECT * FROM missions WHERE id = %s")
                 cursor.execute(query,(id,))
                 data = cursor.fetchone()
         return data
-    def assing_mission(self,m_id,a_id):
+    def assign_mission(self,m_id,a_id):
         with connection.get_connection() as conn:
             with conn.cursor() as cursor :
                 check_agent  = agent.get_agent_by_id(a_id)
@@ -43,6 +40,8 @@ class Mission:
                 mission = self.get_mission_by_id(m_id)
                 if not mission:
                     return "Mission not found"
+                if not check_agent:
+                    return "Agent not found"
                 if mission["status"] != 'NEW':
                     return "Mission not available"
                 if not check_agent:
@@ -50,7 +49,7 @@ class Mission:
                 if check_agent["is_active"] == False:
                     return "Agent is not active"
                 missions_count = len(self.get_open_missions_by_agent(a_id))
-                if missions_count > 3:
+                if missions_count >= 3:
                     return "Agent has reached maximum missions"
                 if mission["level_risk"] == "CRITICAL" and check_agent["agent_rank"] != "Commander":
                     return "Only Commander can handle critical"
@@ -79,7 +78,7 @@ class Mission:
     def get_open_missions_by_agent(self,id):
         with connection.get_connection() as conn:
             with conn.cursor() as cursor :
-                query = "SELECT * FROM missions WHERE id = %s AND (status = 'IN_PROGRESS' OR status = 'ASSIGNED')"
+                query = "SELECT * FROM missions WHERE assigned_agent = %s AND (status = 'IN_PROGRESS' OR status = 'ASSIGNED')"
                 cursor.execute(query,(id,))
                 count = cursor.fetchall()
         return count 
@@ -125,15 +124,17 @@ class Mission:
          with connection.get_connection() as conn:
             with conn.cursor(dictionary=True) as cursor:
                 query = """
-                SELECT  assigned_agent_id
-                FROM  missions
-                ORDER BY status = COMPLETED DESC 
-                LIMIT 1
+                    SELECT assigned_agent_id, COUNT(*) AS completed_count
+                    FROM missions
+                    WHERE status = 'COMPLETED' AND assigned_agent_id IS NOT NULL
+                    GROUP BY assigned_agent_id
+                    ORDER BY completed_count DESC
+                    LIMIT 1
                 """
                 cursor.execute(query)
                 top_member = cursor.fetchone()
 
                 
-            return top_member
+            return agent.get_agent_by_id(top_member["assigned_agent_id"])
    
         

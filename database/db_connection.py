@@ -17,11 +17,10 @@ class Connection:
             password="1234",
             user="root",
         )
-        with self.get_connection() as conn:
-            with conn.cursor() as cursor :
-                query ="CREATE database IF NOT EXSIST intelligence_db"
-                cursor.execute(query)
-                cursor.execute("USE intelligence_db")
+        with conn.cursor() as cursor :
+            query ="CREATE database IF NOT EXISTS intelligence_db"
+            cursor.execute(query)
+            cursor.execute("USE intelligence_db")
         
     def create_tables(self):
         with self.get_connection() as conn:
@@ -55,11 +54,4 @@ class Connection:
            """
                 cursor.execute(query_missions)
                 conn.commit()
-    def database_create(self):
-        with self.get_connection() as conn:
-            with conn.cursor() as cursor :
-                cursor.execute("CREATE DATABASE IF NOT EXISTS intelligence_db")
-                conn.commit()
-        
-s = Connection()
-s.create_tables()
+   
