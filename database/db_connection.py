@@ -29,7 +29,7 @@ class Connection:
                 query_agents = """
                 CREATE TABLE IF NOT EXISTS agents(
                 id INT PRIMARY KEY AUTO_INCREMENT,
-                name VARCHAR(256) ,
+                name VARCHAR(256),
                 specialty VARCHAR (256),
                 is_active BOOLEAN DEFAULT TRUE,
                 completed_missions  INT DEFAULT 0,

@@ -2,9 +2,9 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from enum import Enum
 class agent_enam(str,Enum):
-    Junior="Junior"
-    Senior="Senior"
-    Commander="Commander"
+    Junior='Junior'
+    Senior='Senior'
+    Commander='Commander'
 
 class Create_agent(BaseModel):
     name :Optional[str] = None

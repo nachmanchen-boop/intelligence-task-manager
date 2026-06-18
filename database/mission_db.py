@@ -1,5 +1,5 @@
 from database.db_connection import Connection
-from agent_db import Agent
+from database.agent_db import Agent
 
 connection  = Connection()
 agent = Agent()
@@ -13,9 +13,9 @@ class Mission:
                 
                 val = list(data.values())
 
-               
-                    
-                query = f"INSERT INTO missions({names})  VALUES({count}) "
+
+
+                query = f"INSERT INTO missions({names})  VALUES({count})"
                 cursor.execute(query,val)
                 conn.commit()
 

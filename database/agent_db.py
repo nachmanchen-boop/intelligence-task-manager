@@ -8,8 +8,10 @@ class Agent:
             with conn.cursor() as cursor :
                 count = ", ".join(['%s'] * len(data))
                 names = ", ".join(data.keys())
-                val = list(data.values())
-                query = f"INSERT INTO missions({names})  VALUES({count}) "
+                val = tuple(data.values())
+                query = f"INSERT INTO missions({names})  VALUES({count})"
+                print(query)
+                print(val)
                 cursor.execute(query,val)
                 conn.commit()
                 create = cursor.fetchone()
