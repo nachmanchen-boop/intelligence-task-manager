@@ -1,6 +1,8 @@
 from database.db_connection import Connection
-connection  = Connection()
+from agent_db import Agent
 
+connection  = Connection()
+agent = Agent()
 class Mission:
     def create_mission(self,data:dict):
          with connection.get_connection() as conn:
@@ -35,11 +37,24 @@ class Mission:
     def assing_mission(self,m_id,a_id):
         with connection.get_connection() as conn:
             with conn.cursor() as cursor :
-                
-                is_a_id = self.get_mission_by_id(m_id)
-                if not is_a_id:
-                    return "mission_not_found"
-                
+                check_agent  = agent.get_agent_by_id(a_id)
+                missions_count = len(self.get_open_missions_by_agent(a_id))
+
+                mission = self.get_mission_by_id(m_id)
+                if not mission:
+                    return "Mission not found"
+                if mission["status"] != 'NEW':
+                    return "Mission not available"
+                if not check_agent:
+                    return "Agent not found"
+                if check_agent["is_active"] == False:
+                    return "Agent is not active"
+                missions_count = len(self.get_open_missions_by_agent(a_id))
+                if missions_count > 3:
+                    return "Agent has reached maximum missions"
+                if mission["level_risk"] == "CRITICAL" and check_agent["agent_rank"] != "Commander":
+                    return "Only Commander can handle critical"
+
                 query = "UPDATE missions SET assigned_agent_id = %s  WHERE id = %s "
                 val = (
                     a_id,

@@ -25,9 +25,19 @@ def Assign_task_to_agent(id:int,agent_id:int):
     data=mission.assing_mission(id,agent_id)
     if data == "mission_not_found":
         raise HTTPException(status_code=404,detail=f" mission id {id} not found")
-    if not data :
-        raise HTTPException(status_code=404,detail=f"agent id {id} not found")
-    return {"message":"The task was assigned"}
+    if data == "Mission not available" :
+        raise HTTPException(status_code=400,detail="Mission not available")
+    if data == "Agent not found":
+        raise HTTPException(status_code=404,detail=f" agent id {id} not found")
+    if data == "Agent is not active":
+        raise HTTPException(status_code=400,detail="Agent is not active")
+    if data == "Agent has reached maximum missions":
+       raise HTTPException(status_code=400,detail= "Agent has reached maximum missions")
+    if data == "Only Commander can handle critical":
+        raise HTTPException(status_code=400,detail= "Only Commander can handle critical")
+    if data :
+        return {"message":"The task was assigned"}
+
 @router.put("/{id}/start")
 def starting_a_task(id:int):
     status= "IN_PROGRESS"
