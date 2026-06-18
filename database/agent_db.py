@@ -1,11 +1,12 @@
 from database.db_connection import Connection
 connection  = Connection()
-
+from logger import logger
 #Connection.get_connection()
 class Agent:
     def create_agent(self,data:dict):
         with connection.get_connection() as conn:
             with conn.cursor() as cursor :
+                logger.info ("start create_agent")
                 count = ", ".join(['%s'] * len(data))
                 names = ", ".join(data.keys())
                 val = tuple(data.values())
@@ -124,5 +125,5 @@ class Agent:
                 count = cursor.fetchone()
                 if not count:
                     return 0
-        return count['active']
+        return count
 

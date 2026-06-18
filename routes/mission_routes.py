@@ -23,7 +23,7 @@ def get_by_id(id:int):
 
 @router.put("/{id}/assign/{agent_id}")
 def Assign_task_to_agent(id:int,agent_id:int):
-    data=mission.assing_mission(id,agent_id)
+    data=mission.assign_mission(id,agent_id)
     if data == "Mission_not_found":
         raise HTTPException(status_code=404,detail=f" mission id {id} not found")
     if data == "Mission not available" :

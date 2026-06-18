@@ -1,6 +1,6 @@
 from database.db_connection import Connection
 from database.agent_db import Agent
-
+from logger import logger
 connection  = Connection()
 agent = Agent()
 class Mission:
@@ -78,7 +78,7 @@ class Mission:
     def get_open_missions_by_agent(self,id):
         with connection.get_connection() as conn:
             with conn.cursor() as cursor :
-                query = "SELECT * FROM missions WHERE assigned_agent = %s AND (status = 'IN_PROGRESS' OR status = 'ASSIGNED')"
+                query = "SELECT * FROM missions WHERE assigned_agent_id = %s AND (status = 'IN_PROGRESS' OR status = 'ASSIGNED')"
                 cursor.execute(query,(id,))
                 count = cursor.fetchall()
         return count 
@@ -96,7 +96,7 @@ class Mission:
                 query = f"SELECT COUNT(*) AS count_missions FROM missions WHERE status = %s"
                 cursor.execute(query,(status,))
                 count = cursor.fetchone()
-        return count 
+                return count 
     def count_open_missions(self):
         with connection.get_connection() as conn:
             with conn.cursor() as cursor :
@@ -106,7 +106,7 @@ class Mission:
                                 """
                 cursor.execute(query)
                 data = cursor.fetchall()
-        return data
+                return data
 
     def count_critical_missions(self):
         with connection.get_connection() as conn:
@@ -116,7 +116,7 @@ class Mission:
                 for d in data:
                     if (d["difficulty"] * 2 + d["importance"]) > 25:
                         result.append(d)
-            return len(result)
+                        return len(result)
                  
   
 
@@ -129,12 +129,14 @@ class Mission:
                     WHERE status = 'COMPLETED' AND assigned_agent_id IS NOT NULL
                     GROUP BY assigned_agent_id
                     ORDER BY completed_count DESC
-                    LIMIT 1
+                    LIMIT 2
                 """
                 cursor.execute(query)
                 top_member = cursor.fetchone()
-
-                
-            return agent.get_agent_by_id(top_member["assigned_agent_id"])
+                print(top_member)
+                if not top_member :
+                    return None
+            
+                return agent.get_agent_by_id(top_member["assigned_agent_id"])
    
         

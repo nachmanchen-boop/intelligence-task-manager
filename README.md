@@ -96,6 +96,34 @@ get_top_agent()                                                     Agent with t
 10) Only a task with a status of NEW or ASSIGNED can be canceled — otherwise an error.
 ```
 
+stAPI, מחבר את כל ה-routers, ובעת עליית השרת קורא ל-database_create)(
+ו-tables_create)(. זהו נקודת הכניסה היחידה לאפליקציה.
+Agents endpoints
+.AgentDB של גלובלי instance מכיל — agent_routes.py :קובץ
+Method Endpoint תיאור
+יצירת סוכן חדש agents/[ POST]
+כל הסוכנים agents/[ GET]
+]GET[ /agents/{id} ID לפי סוכן
+]PUT[ /agents/{id} סוכן עדכון
+]PUT[ /agents/{id}/deactivate סוכן השבתת
+]GET[ /agents/{id}/performance סוכן ביצועי
+Missions endpoints
+.AgentDB-ו MissionDB של גלובלי instance מכיל — mission_routes.py :קובץ
+Method Endpoint תיאור
+יצירת משימה missions/[ POST]
+כל המשימות missions/[ GET]
+]GET[ /missions/{id} ID לפי משימה
+]PUT[ /missions/{id}/assign/{agent_id} )בהמשך מוסבר בדיקות 6 )לסוכן שיוך
+]PUT[ /missions/{id}/start משימה התחלת
+]PUT[ /missions/{id}/complete בהצלחה סיום
+]PUT[ /missions/{id}/fail בכישלון סיום
+]PUT[ /missions/{id}/cancel משימה ביטול
+Reports endpoints
+report_routes.py :קובץ
+Method Endpoint תיאור
+דוח כללי של המערכת summary/reports/[ GET]
+]GET[ /reports/missions-by-status סטטוס לפי משימות
+]GET[ /reports/top-agent )get_top_agent( המצטיין ה
 ## Database (Docker)
 
 ```bash

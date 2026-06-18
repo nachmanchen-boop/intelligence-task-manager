@@ -15,9 +15,9 @@ app.include_router(router_report,prefix="/reports")
 
 
 if "__main__"== __name__:
+    logger.info("start app")
     connection = Connection()
 
-    connection.create_databae()
     connection.create_tables()
 
     uvicorn.run("main:app",port=8000,host='127.0.0.1',reload=True)
