@@ -1,7 +1,9 @@
 from fastapi import APIRouter,HTTPException
 from models.mission_model import Create_mission,Update_mission
 from database.mission_db import Mission
+from logger import logger
 router = APIRouter()
+
 
 mission = Mission()
 @router.post("",status_code=201)
@@ -15,10 +17,15 @@ def get_all():
     return {"message":data}
 @router.get("/{id}")
 def get_by_id(id:int):
+    logger.info("start get_by_id")
     data = mission.get_mission_by_id(id)
 
     if not data :
+        logger.error("error get_by_id")
+
         raise HTTPException(status_code=404,detail=f"id {id} not found")
+    logger.info("end get_by_id")
+
     return {"message":data}
 
 @router.put("/{id}/assign/{agent_id}")
@@ -71,6 +78,7 @@ def cansel_a_task(id:int):
     status= "CANCELLED"
     result=mission.update_mission_status(id=id,status=status)
     if not result:
+        logger.error("error cansel_a_task")
         raise HTTPException(status_code=404,detail=f"id {id} not found")
     return {"message":"The mission has CANCELLED."}
 
