@@ -30,6 +30,7 @@ def get_by_id(id:int):
 
 @router.put("/{id}/assign/{agent_id}")
 def Assign_task_to_agent(id:int,agent_id:int):
+    logger.info("start Assign_task_to_agent")
     data=mission.assign_mission(id,agent_id)
     if data == "Mission_not_found":
         raise HTTPException(status_code=404,detail=f" mission id {id} not found")
@@ -43,8 +44,9 @@ def Assign_task_to_agent(id:int,agent_id:int):
        raise HTTPException(status_code=400,detail= "Agent has reached maximum missions")
     if data == "Only Commander can handle critical":
         raise HTTPException(status_code=400,detail= "Only Commander can handle critical")
-    if data :
-        return {"message":"The task was assigned"}
+    logger.info("end Assign_task_to_agent")
+
+    return {"message":"The task was assigned"}
 
 @router.put("/{id}/start")
 def starting_a_task(id:int):
