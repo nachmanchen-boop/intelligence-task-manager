@@ -10,7 +10,19 @@ class Connection:
             database="intelligence_db"
         )
         return conn
-
+    def create_databae(self):
+        conn = mysql.connector.connect(
+            host="localhost",
+            port="3306",
+            password="1234",
+            user="root",
+        )
+        with self.get_connection() as conn:
+            with conn.cursor() as cursor :
+                query ="CREATE database IF NOT EXSIST intelligence_db"
+                cursor.execute(query)
+                cursor.execute("USE intelligence_db")
+        
     def create_tables(self):
         with self.get_connection() as conn:
             with conn.cursor() as cursor :

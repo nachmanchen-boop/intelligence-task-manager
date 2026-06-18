@@ -2,23 +2,22 @@ from database.db_connection import Connection
 connection  = Connection()
 
 class Mission:
-    def create_mission(data):
+    def create_mission(self,data:dict):
          with connection.get_connection() as conn:
             with conn.cursor() as cursor :
-                parts = []
-                val = []
                 print("ddd")
-                for key,value in data.items() :
-                    parts.append(f"{key} = %s")
-                    val.append(value)
-                d = {f", ".join(parts)}
-                val.append(id)
-                query = f"""INSERT INTO missions
-                VALUES(d) """
+                count = ", ".join(['%s'] * len(data))
+                names = ", ".join(data.keys())
+                
+                val = list(data.values())
+
+               
+                    
+                query = f"INSERT INTO missions({names})  VALUES({count}) "
                 cursor.execute(query,val)
                 conn.commit()
 
-    def get_all_missions():
+    def get_all_missions(self):
         with connection.get_connection() as conn:
             with conn.cursor(dictionary=True) as cursor :
                 cursor.execute("SELECT * FROM missions")
@@ -26,26 +25,31 @@ class Mission:
         return data
 
 
-    def get_mission_by_id(id):
+    def get_mission_by_id(self,id):
         with connection.get_connection() as conn:
             with conn.cursor() as cursor :
                 query = ("SELECT * FROM missions WHERE id = %s")
                 cursor.execute(query,(id,))
                 data = cursor.fetchone()
         return data
-    def assing_mission(m_id,a_id):
+    def assing_mission(self,m_id,a_id):
         with connection.get_connection() as conn:
             with conn.cursor() as cursor :
+                
+                is_a_id = self.get_mission_by_id(m_id)
+                if not is_a_id:
+                    return "mission_not_found"
+                
                 query = "UPDATE missions SET assigned_agent_id = %s  WHERE id = %s "
                 val = (
-                    m_id,
-                    a_id
+                    a_id,
+                    m_id
                 )
                 cursor.execute(query,val)
                 conn.commit()
                 is_changed = cursor.rowcount > 0 
         return is_changed
-    def update_mission_status(id,status):
+    def update_mission_status(self,id,status):
         with connection.get_connection() as conn:
             with conn.cursor() as cursor :
                 query = "UPDATE missions SET status = %s  WHERE id = %s "
@@ -57,14 +61,14 @@ class Mission:
                 conn.commit()
                 is_changed = cursor.rowcount > 0 
         return is_changed
-    def get_open_missions_by_agent(id):
+    def get_open_missions_by_agent(self,id):
         with connection.get_connection() as conn:
             with conn.cursor() as cursor :
-                query = "SELECT * FROM missions WHERE id = %s AND status = IN_PROGRESS OR status = ASSIGNED"
+                query = "SELECT * FROM missions WHERE id = %s AND (status = 'IN_PROGRESS' OR status = 'ASSIGNED')"
                 cursor.execute(query,(id,))
                 count = cursor.fetchall()
         return count 
-    def count_all_missions():
+    def count_all_missions(self):
         with connection.get_connection() as conn:
             with conn.cursor() as cursor :
                 query = "SELECT COUNT(*) AS count_missions FROM missions "
@@ -72,18 +76,18 @@ class Mission:
                 count = cursor.fetchone()
         return count 
 
-    def count_by_status(status):
+    def count_by_status(self,status):
         with connection.get_connection() as conn:
             with conn.cursor() as cursor :
-                query = f"SELECT COUNT(*) AS count_missions FROM missions WHERE status = {status}"
-                cursor.execute(query)
+                query = f"SELECT COUNT(*) AS count_missions FROM missions WHERE status = %s"
+                cursor.execute(query,(status,))
                 count = cursor.fetchone()
         return count 
     def count_open_missions(self):
         with connection.get_connection() as conn:
             with conn.cursor() as cursor :
                 query = """SELECT COUNT(status)
-                                FROM misssion 
+                                FROM misssions 
                                 WHERE status = 'NEW';
                                 """
                 cursor.execute(query)
@@ -95,14 +99,14 @@ class Mission:
             with conn.cursor() as cursor :
                 data = self.get_all_missions()
                 result = []
-                for d in data.items():
-                    if d["difficulty"] * 2 + d["importance"] > 25:
+                for d in data:
+                    if (d["difficulty"] * 2 + d["importance"]) > 25:
                         result.append(d)
-            return result
+            return len(result)
                  
   
 
-    def get_top_agents():
+    def get_top_agents(self):
          with connection.get_connection() as conn:
             with conn.cursor(dictionary=True) as cursor:
                 query = """
