@@ -6,9 +6,10 @@ agent = Agent()
 from logger import logger
 @router.post("",status_code=201)
 def posr_agent(body:Create_agent):
-    logger.info("start ")
+    logger.info("start posr_agent")
     data = body.model_dump(exclude_none=True)
     if not data :
+        logger.error("error")
         HTTPException(status_code=400,detail="tehris not data")
     result = agent.create_agent(data)
     return {"message":result}
@@ -25,7 +26,7 @@ def get_by_id(id:int):
 
     data = agent.get_agent_by_id(id)
     if not data :
-        logger.info("error get_by_id")
+        logger.error("error get_by_id")
 
         raise HTTPException(status_code=404,detail=f"id {id} not found")
     logger.info("end get_by_id")
@@ -37,12 +38,12 @@ def Agent_update(id:int,body:Update_agent):
 
     data = body.model_dump(exclude_none=True)
     if not data :
-        logger.info("error Agent_update")
+        logger.error("error Agent_update")
 
         raise HTTPException(status_code=400,detail="There is nothing to update.")
     result = agent.update_agent(data)
     if not result:
-                logger.info("error Agent_update")
+                logger.error("error Agent_update")
 
                 raise HTTPException(status_code=404,detail=f"id {id} not found")
     logger.info("end Agent_update")
@@ -54,14 +55,14 @@ def agent_deactivation(id:int):
 
     is_exsust = agent.get_agent_by_id(id)
     if not is_exsust:
-        logger.info("error agent_deactivation")
+        logger.error("error agent_deactivation")
 
         raise HTTPException(status_code=404,detail=f"id {id} not found")
 
     result = agent.deactivate_agent(id)
 
     if not result:
-        logger.info("error agent_deactivation")
+        logger.error("error agent_deactivation")
 
         raise HTTPException(status_code=400,detail="not sucssus")
     logger.info("end agent_deactivation")
@@ -75,7 +76,7 @@ def agent_performance(id:int):
 
     result = agent.get_agent_performance(id)
     if not result:
-        logger.info("error agent_performance")
+        logger.error("error agent_performance")
 
         raise HTTPException(status_code=404,detail=f"id {id} not found")
     
